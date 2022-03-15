@@ -1,0 +1,33 @@
+# ===================================================
+# Stage 1 - Keycloak build configuration
+# ===================================================
+ARG KEYCLOAK_VERSION=17.0.0
+FROM quay.io/keycloak/keycloak:${KEYCLOAK_VERSION} as builder
+
+# Set to path used by older versions of KeyCloak
+ENV KC_HTTP_RELATIVE_PATH=/auth
+
+# Disable until we can find a way to hide them from the ingress
+ENV KC_METRICS_ENABLED=false
+
+# Which features to enable 
+ENV KC_FEATURES=token-exchange
+
+RUN /opt/keycloak/bin/kc.sh build
+
+# ===================================================
+# Stage 2 - Runtime image
+# ===================================================
+ARG KEYCLOAK_VERSION=17.0.0
+FROM quay.io/keycloak/keycloak:${KEYCLOAK_VERSION} as runtime
+COPY --from=builder /opt/keycloak/lib/quarkus/ /opt/keycloak/lib/quarkus/
+WORKDIR /opt/keycloak
+
+# The following WILL successfully a simple realm (e.g. including users, groups, realm roles)
+# but there appears to be an issue importing realms which have custom clients (which have
+# authorization enabled)
+# COPY ./master-realm.json /opt/keycloak/master-realm.json
+# RUN /opt/keycloak/bin/kc.sh import --file=/opt/keycloak/master-realm.json
+
+EXPOSE 8080
+ENTRYPOINT ["/opt/keycloak/bin/kc.sh", "start"]

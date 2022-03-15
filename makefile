@@ -7,6 +7,7 @@ IMAGE_REG ?= ghcr.io
 IMAGE_REPO ?= benc-uk/keycloak
 IMAGE_TAG ?= latest
 IMAGE_PREFIX := $(IMAGE_REG)/$(IMAGE_REPO)
+DOCKERFILE ?= Dockerfile.mssql
 
 KC_USER ?= admin
 KC_PASSWORD ?= admin
@@ -23,7 +24,7 @@ help: ## 💬 This help message :)
 
 image: ## 📦 Build container image from Dockerfile
 	@figlet $@ || true
-	docker build --file ./Dockerfile \
+	docker build --file ./$(DOCKERFILE) \
 	--build-arg BUILD_INFO="$(BUILD_INFO)" \
 	--build-arg VERSION="$(VERSION)" \
 	--tag $(IMAGE_PREFIX):$(IMAGE_TAG) . 

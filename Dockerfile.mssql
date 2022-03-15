@@ -5,7 +5,7 @@ ARG KEYCLOAK_VERSION=17.0.0
 FROM quay.io/keycloak/keycloak:${KEYCLOAK_VERSION} as builder
 
 # Enable MS-SQL as a database
-#ENV KC_DB=mssql
+ENV KC_DB=mssql
 
 # Set to path used by older versions of KeyCloak
 ENV KC_HTTP_RELATIVE_PATH=/auth
@@ -18,8 +18,7 @@ ENV KC_FEATURES=token-exchange
 
 # The flags -Dkc.db-tx-type -Dkc.db-driver are to disable XA and to support Azure SQL 
 # - see https://github.com/keycloak/keycloak/issues/10191
-RUN /opt/keycloak/bin/kc.sh build 
-#-Dkc.db-tx-type=enabled -Dkc.db-driver=com.microsoft.sqlserver.jdbc.SQLServerDriver
+RUN /opt/keycloak/bin/kc.sh build -Dkc.db-tx-type=enabled -Dkc.db-driver=com.microsoft.sqlserver.jdbc.SQLServerDriver
 
 # ===================================================
 # Stage 2 - Runtime image
