@@ -1,0 +1,76 @@
+replicaCount: 1
+
+image:
+  registry: quay.io
+  repository: keycloak/keycloak
+  pullPolicy: Always
+  tag: "17.0.0"
+
+keycloak:
+  healthCheckPath: /auth/realms/master
+  logLevel: INFO
+  adminUser: admin
+  adminPasswordSecret:
+    name: ""
+    key: ""
+  proxyMode: edge
+  httpEnabled: true
+  hostnameStrict: false
+  hostnameStrictHttps: false
+  extraEnv:
+    # FOO: BAR
+
+  database:
+    passwordSecret:
+      # Tip: use `extraSecrets` and template the value here as "{{ .Release.Name }}-{{ .Chart.Name }}-database"
+      name: ""
+      key: ""
+    username: ""
+    host: ""
+    databaseName: ""
+    properties: ""
+
+extraSecrets:
+  {}
+  # database:
+  #   password: T0pSecret123!
+
+extraVolumes: {}
+extraVolumeMounts: {}
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+podAnnotations: {}
+podLabels: {}
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+  className: ""
+  annotations:
+  host: keycloak.example.net
+  path: /
+  pathType: Prefix
+  tls:
+    enabled: false
+    secretName: ""
+
+resources:
+  # Vaguely low defaults based on educated guess
+  limits:
+    cpu: 2000m
+    memory: 2G
+  requests:
+    cpu: 200m
+    memory: 400Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

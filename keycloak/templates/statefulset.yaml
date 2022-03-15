@@ -1,0 +1,107 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "keycloak-chart.fullname" . }}
+  labels:
+    {{- include "keycloak-chart.labels" . | nindent 4 }}
+spec:
+  serviceName: {{ include "keycloak-chart.fullname" . }}
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "keycloak-chart.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "keycloak-chart.selectorLabels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }} 
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+
+          image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            {{- range $k, $v := .Values.keycloak.extraEnv }}
+            - name: {{ $k }}
+              value: "{{ $v }}"
+            {{- end }}     
+                
+            - name: KEYCLOAK_LOG_LEVEL
+              value: {{ .Values.keycloak.logLevel }}
+            - name: KEYCLOAK_ADMIN
+              value: {{ .Values.keycloak.adminUser }}
+            - name: KC_PROXY
+              value: {{ .Values.keycloak.proxyMode }}
+            - name: KC_HTTP_ENABLED
+              value: "{{ .Values.keycloak.httpEnabled }}"
+            - name: KC_HOSTNAME_STRICT
+              value: "{{ .Values.keycloak.hostnameStrict }}"
+            - name: KC_HOSTNAME_STRICT_HTTPS
+              value: "{{ .Values.keycloak.hostnameStrictHttps }}"
+
+            - name: KEYCLOAK_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                {{- if .Values.keycloak.adminPasswordSecret.name }}
+                  name: {{ .Values.keycloak.adminPasswordSecret.name }}
+                  key: {{ .Values.keycloak.adminPasswordSecret.key }}                
+                {{- else }}
+                  name: {{ include "keycloak-chart.fullname" . }}-admin-secret
+                  key: password
+                {{- end }}
+
+            - name: KC_DB_USERNAME
+              value: "{{ .Values.keycloak.database.username }}"
+            - name: KC_DB_URL_DATABASE
+              value: "{{ .Values.keycloak.database.databaseName }}"
+            - name: KC_DB_URL_HOST
+              value: "{{ .Values.keycloak.database.host }}"
+            - name: KC_DB_URL_PROPERTIES
+              value: "{{ .Values.keycloak.database.properties }}"              
+            - name: KC_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ tpl .Values.keycloak.database.passwordSecret.name . }}
+                  key: {{ .Values.keycloak.database.passwordSecret.key }}                
+
+          ports:
+            - name: http
+              containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.keycloak.healthCheckPath }}
+              port: 8080
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            {{- toYaml .Values.extraVolumeMounts | nindent 12 }} 
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+  
+      {{- with .Values.extraVolumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

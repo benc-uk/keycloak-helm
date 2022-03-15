@@ -1,0 +1,42 @@
+image:
+  registry: ghcr.io
+  repository: benc-uk/keycloak
+  tag: latest
+
+keycloak:
+  proxyMode: edge
+  adminUser: superAdmin
+
+  database:
+    passwordSecret:
+      name: sql-server-database-creds
+      key: dbpassword
+    username: "dbadmin"
+    host: "benc.database.windows.net"
+    databaseName: "keycloak"
+
+ingress:
+  className: nginx
+  enabled: true
+  host: keycloak.kube.benco.io
+  tls:
+    enabled: true
+    secretName: benco-io-cert
+
+# Everything below here is just to get the dbpassword secret from Key Vault
+
+podLabels:
+  aadpodidbinding: keycloak-identity-binding
+
+extraVolumes:
+  - name: secrets-store-inline
+    csi:
+      driver: secrets-store.csi.k8s.io
+      readOnly: true
+      volumeAttributes:
+        secretProviderClass: "keycloak-secrets"
+
+extraVolumeMounts:
+  - name: secrets-store-inline
+    mountPath: /mnt/secrets-store
+    readOnly: true
