@@ -4,6 +4,9 @@
 ARG KEYCLOAK_VERSION=17.0.0
 FROM quay.io/keycloak/keycloak:${KEYCLOAK_VERSION} as builder
 
+# Enable kubernetes as a cluster cache, keycloak.clustered=true must be set in Helm values
+ENV KC_CACHE_STACK=kubernetes
+
 # Enable MS-SQL as a database
 ENV KC_DB=mssql
 

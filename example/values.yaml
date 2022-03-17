@@ -1,11 +1,16 @@
+replicaCount: 1
+
 image:
   registry: ghcr.io
   repository: benc-uk/keycloak
   tag: latest
 
 keycloak:
+  httpPort: 7000
+  clustered: true
   proxyMode: edge
   adminUser: superAdmin
+  healthCheckPath: /auth/realms/master
 
   database:
     passwordSecret:

@@ -1,76 +1,125 @@
+# -- Only enable multiple replicas if the image has a cluster provider enabled, and set keycloak.clustered=true
 replicaCount: 1
 
 image:
+  # -- The registry where the custom Keycloak image is stored
   registry: quay.io
+  # -- The name/repository of the custom Keycloak image
   repository: keycloak/keycloak
+  # -- Image pull policy for the pods
   pullPolicy: Always
+  # -- The tag of the custom Keycloak image
   tag: "17.0.0"
 
 keycloak:
-  healthCheckPath: /auth/realms/master
+  # -- Enable this if the Keycloak image has clustering enabled, needs to be true even if number of replicas is 1
+  clustered: true
+  # -- The arguments passed to the entrypoint in the Keycloak container (normally this will be kc.sh)
+  args: []
+  # -- The URL path used by readiness checks
+  healthCheckPath: /realms/master
+  # -- Set logging level for Keycloak
   logLevel: INFO
+  # -- The name of the primary admin user added to Keycloak at first startup
   adminUser: admin
+  # -- Secret containing the password for the primary admin user
   adminPasswordSecret:
     name: ""
     key: ""
+  # -- The port used for HTTP access
+  httpPort: 7000
+  # -- The proxy forwarding mode
   proxyMode: edge
+  # -- Enable or disable HTTP
   httpEnabled: true
+  # -- Enable or disable strict checking of the host
   hostnameStrict: false
+  # -- Enable or disable strict checking of the TLS certificate
   hostnameStrictHttps: false
+  # -- Append settings to the startup via JAVA_OPTS_APPEND
+  javaOptsAppend: ""
+  # -- Extra environment variables to set in the pod
   extraEnv:
     # FOO: BAR
 
   database:
+    # -- External database: reference to the secret containing the DB password
     passwordSecret:
       # Tip: use `extraSecrets` and template the value here as "{{ .Release.Name }}-{{ .Chart.Name }}-database"
       name: ""
       key: ""
+    # -- External database: DB username
     username: ""
+    # -- External database: hostname of the database
     host: ""
+    # -- External database: DB name
     databaseName: ""
+    # -- External database: extra properties to add to the JDBC URL
     properties: ""
 
+# -- Use this to have the chart create extra Kubernetes secrets and assign values to them
 extraSecrets:
   {}
   # database:
   #   password: T0pSecret123!
 
-extraVolumes: {}
-extraVolumeMounts: {}
+# -- Volumes to add to the pods
+extraVolumes: []
+# -- VolumeMounts to add the pods
+extraVolumeMounts: []
 
+# -- If secrets are required to pull the images
 imagePullSecrets: []
+# -- String to partially override fullname template (will maintain the release name)
 nameOverride: ""
+# -- String to completely override fullname template
 fullnameOverride: ""
 
+# -- Annotations to add to the pods
 podAnnotations: {}
+# -- Labels to add to the pods
 podLabels: {}
 
 service:
+  # -- Type of service to create for Keycloak HTTP traffic
   type: ClusterIP
+  # -- The port used for HTTP access into the service
   port: 80
 
 ingress:
+  # -- Enable or disable ingress, a single rule will be created for the service
   enabled: false
+  # -- The IngressClass to use
   className: ""
+  # -- Additionnal annotations to add to the ingress
   annotations:
+  # -- Hostname to use for the ingress rule
   host: keycloak.example.net
+  # -- The path to use for the ingress rule
   path: /
+  # -- The path type, leave as 'Prefix' if unsure
   pathType: Prefix
   tls:
+    # -- Enable TLS for the ingress
     enabled: false
+    # -- The secret containing the TLS certificate
     secretName: ""
 
+# -- Resource limits and requests
 resources:
   # Vaguely low defaults based on educated guess
   limits:
     cpu: 2000m
-    memory: 2G
+    memory: 1G
   requests:
     cpu: 200m
     memory: 400Mi
 
+# -- If you want to use a nodeSelector for the pods
 nodeSelector: {}
 
+# -- If you want to assign tolerations to the pods
 tolerations: []
 
+# -- If you want to assign affinity to the pods
 affinity: {}
