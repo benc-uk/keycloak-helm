@@ -1,4 +1,4 @@
-replicaCount: 1
+replicaCount: 2
 
 image:
   registry: ghcr.io
@@ -11,6 +11,7 @@ keycloak:
   proxyMode: edge
   adminUser: superAdmin
   healthCheckPath: /auth/realms/master
+  hostnamePath: auth
 
   database:
     passwordSecret:

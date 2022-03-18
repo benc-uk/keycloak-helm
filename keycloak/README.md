@@ -37,10 +37,11 @@ A Helm chart for deploying Quarkus based Keycloak (aka Keycloak.X or version 17+
 | keycloak.database.username | string | `""` | External database: DB username |
 | keycloak.extraEnv | string | `nil` | Extra environment variables to set in the pod |
 | keycloak.healthCheckPath | string | `"/realms/master"` | The URL path used by readiness checks |
+| keycloak.hostnamePath | string | `""` | This should be set if proxy uses a different context path for Keycloak |
 | keycloak.hostnameStrict | bool | `false` | Enable or disable strict checking of the host |
 | keycloak.hostnameStrictHttps | bool | `false` | Enable or disable strict checking of the TLS certificate |
 | keycloak.httpEnabled | bool | `true` | Enable or disable HTTP |
-| keycloak.httpPort | int | `7000` | The port used for HTTP access |
+| keycloak.httpPort | int | `8080` | The port used for HTTP access |
 | keycloak.javaOptsAppend | string | `""` | Append settings to the startup via JAVA_OPTS_APPEND |
 | keycloak.logLevel | string | `"INFO"` | Set logging level for Keycloak |
 | keycloak.proxyMode | string | `"edge"` | The proxy forwarding mode |

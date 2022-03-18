@@ -53,6 +53,10 @@ spec:
               value: {{ .Values.keycloak.hostnameStrict | quote }}
             - name: KC_HOSTNAME_STRICT_HTTPS
               value: {{ .Values.keycloak.hostnameStrictHttps | quote }}
+            {{- if .Values.keycloak.hostnamePath }}  
+            - name: KC_HOSTNAME_PATH
+              value: {{ .Values.keycloak.hostnamePath | quote }}
+            {{- end }}                
 
             - name: KEYCLOAK_ADMIN_PASSWORD
               valueFrom:
@@ -61,7 +65,7 @@ spec:
                   name: {{ .Values.keycloak.adminPasswordSecret.name }}
                   key: {{ .Values.keycloak.adminPasswordSecret.key }}                
                 {{- else }}
-                  name: {{ include "keycloak-chart.fullname" . }}-admin-secret
+                  name: {{ include "keycloak-chart.fullname" . }}-admin
                   key: password
                 {{- end }}
 

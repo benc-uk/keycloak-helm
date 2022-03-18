@@ -1,7 +1,7 @@
 # ===================================================
 # Stage 1 - Keycloak build configuration
 # ===================================================
-ARG KEYCLOAK_VERSION=17.0.0
+ARG KEYCLOAK_VERSION="17.0.0"
 FROM quay.io/keycloak/keycloak:${KEYCLOAK_VERSION} as builder
 
 # Enable kubernetes as a cluster cache, keycloak.clustered=true must be set in Helm values
@@ -13,7 +13,7 @@ ENV KC_DB=mssql
 # Set to path used by older versions of KeyCloak
 ENV KC_HTTP_RELATIVE_PATH=/auth
 
-# Disable until we can find a way to hide them from the ingress
+# Metrics are optional and I don't want to expose them
 ENV KC_METRICS_ENABLED=false
 
 # Which features to enable 
@@ -26,7 +26,7 @@ RUN /opt/keycloak/bin/kc.sh build -Dkc.db-tx-type=enabled -Dkc.db-driver=com.mic
 # ===================================================
 # Stage 2 - Runtime image
 # ===================================================
-ARG KEYCLOAK_VERSION=17.0.0
+ARG KEYCLOAK_VERSION="17.0.0"
 FROM quay.io/keycloak/keycloak:${KEYCLOAK_VERSION} as runtime
 COPY --from=builder /opt/keycloak/lib/quarkus/ /opt/keycloak/lib/quarkus/
 WORKDIR /opt/keycloak

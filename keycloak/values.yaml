@@ -27,7 +27,7 @@ keycloak:
     name: ""
     key: ""
   # -- The port used for HTTP access
-  httpPort: 7000
+  httpPort: 8080
   # -- The proxy forwarding mode
   proxyMode: edge
   # -- Enable or disable HTTP
@@ -36,6 +36,8 @@ keycloak:
   hostnameStrict: false
   # -- Enable or disable strict checking of the TLS certificate
   hostnameStrictHttps: false
+  # -- This should be set if proxy uses a different context path for Keycloak
+  hostnamePath: ""
   # -- Append settings to the startup via JAVA_OPTS_APPEND
   javaOptsAppend: ""
   # -- Extra environment variables to set in the pod
