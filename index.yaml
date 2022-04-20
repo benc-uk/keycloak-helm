@@ -1,0 +1,21 @@
+apiVersion: v1
+entries:
+  keycloak:
+  - apiVersion: v2
+    appVersion: 17.0.0
+    created: "2022-04-20T15:33:44.275485071+01:00"
+    description: A Helm chart for deploying Keycloak.x (aka Keycloak Quarkus or version
+      17+). Supports external database, ingress and clustering
+    digest: d94efa650a31b5d9e07853729103783ddba266317ed6c525fe305b5c2bfc142c
+    keywords:
+    - keycloak
+    - keycloak-quarkus
+    - keycloak-x
+    maintainers:
+    - name: Ben Coleman
+    name: keycloak
+    type: application
+    urls:
+    - keycloak-1.0.0.tgz
+    version: 1.0.0
+generated: "2022-04-20T15:33:44.274778735+01:00"
