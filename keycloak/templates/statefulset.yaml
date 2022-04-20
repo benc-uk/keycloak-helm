@@ -21,7 +21,7 @@ spec:
         {{- include "keycloak-chart.selectorLabels" . | nindent 8 }}
         {{- with .Values.podLabels }}
           {{- toYaml . | nindent 8 }}
-        {{- end }} 
+        {{- end }}
 
     spec:
       {{- with .Values.imagePullSecrets }}
@@ -37,12 +37,21 @@ spec:
             {{- range $k, $v := .Values.keycloak.extraEnv }}
             - name: {{ $k }}
               value: "{{ $v }}"
-            {{- end }}     
-                
+            {{- end }}
+            {{- range $k, $v := .Values.keycloak.extraEnvSecret }}
+            - name: {{ $k }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $v.secretName }}
+                  key: {{ $v.secretKey }}
+            {{- end }}
+
             - name: KEYCLOAK_LOG_LEVEL
               value: {{ .Values.keycloak.logLevel | quote }}
+            {{- if .Values.keycloak.adminUser }}
             - name: KEYCLOAK_ADMIN
               value: {{ .Values.keycloak.adminUser | quote }}
+            {{- end }}
             - name: KC_PROXY
               value: {{ .Values.keycloak.proxyMode | quote }}
             - name: KC_HTTP_PORT
@@ -53,45 +62,45 @@ spec:
               value: {{ .Values.keycloak.hostnameStrict | quote }}
             - name: KC_HOSTNAME_STRICT_HTTPS
               value: {{ .Values.keycloak.hostnameStrictHttps | quote }}
-            {{- if .Values.keycloak.hostnamePath }}  
+            {{- if .Values.keycloak.hostnamePath }}
             - name: KC_HOSTNAME_PATH
               value: {{ .Values.keycloak.hostnamePath | quote }}
-            {{- end }}                
+            {{- end }}
 
             - name: KEYCLOAK_ADMIN_PASSWORD
               valueFrom:
                 secretKeyRef:
                 {{- if .Values.keycloak.adminPasswordSecret.name }}
                   name: {{ .Values.keycloak.adminPasswordSecret.name }}
-                  key: {{ .Values.keycloak.adminPasswordSecret.key }}                
+                  key: {{ .Values.keycloak.adminPasswordSecret.key }}
                 {{- else }}
                   name: {{ include "keycloak-chart.fullname" . }}-admin
                   key: password
                 {{- end }}
 
-            {{- if .Values.keycloak.database.username }}  
+            {{- if .Values.keycloak.database.username }}
             - name: KC_DB_USERNAME
               value: {{ .Values.keycloak.database.username | quote }}
-            {{- end }}  
-            {{- if .Values.keycloak.database.databaseName }}  
+            {{- end }}
+            {{- if .Values.keycloak.database.databaseName }}
             - name: KC_DB_URL_DATABASE
               value: {{ .Values.keycloak.database.databaseName | quote }}
-            {{- end }}  
-            {{- if .Values.keycloak.database.host }}  
+            {{- end }}
+            {{- if .Values.keycloak.database.host }}
             - name: KC_DB_URL_HOST
               value: {{ .Values.keycloak.database.host | quote }}
-            {{- end }}  
-            {{- if .Values.keycloak.database.properties }}                
+            {{- end }}
+            {{- if .Values.keycloak.database.properties }}
             - name: KC_DB_URL_PROPERTIES
-              value: {{ .Values.keycloak.database.properties | quote }} 
-            {{- end }}  
-            {{- if .Values.keycloak.database.passwordSecret.name }}             
+              value: {{ .Values.keycloak.database.properties | quote }}
+            {{- end }}
+            {{- if .Values.keycloak.database.passwordSecret.name }}
             - name: KC_DB_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: {{ tpl .Values.keycloak.database.passwordSecret.name . }}
                   key: {{ .Values.keycloak.database.passwordSecret.key }}
-            {{- end }}   
+            {{- end }}
 
             - name: JAVA_OPTS_APPEND
               {{- if .Values.keycloak.clustered }}
@@ -110,7 +119,7 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
-            {{- toYaml .Values.extraVolumeMounts | nindent 12 }} 
+            {{- toYaml .Values.extraVolumeMounts | nindent 12 }}
 
       {{- with .Values.nodeSelector }}
       nodeSelector:
@@ -126,7 +135,7 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-  
+
       {{- with .Values.extraVolumes }}
       volumes:
         {{- toYaml . | nindent 8 }}

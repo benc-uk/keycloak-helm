@@ -1,5 +1,5 @@
 ====================================
- 🔐 Keycloak has been deployed 🚀 
+ 🔐 Keycloak has been deployed 🚀
 ====================================
 
 Image: {{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}
@@ -30,7 +30,9 @@ Get access to Keycloak by running these commands:
   kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 8080:$CONTAINER_PORT
 {{- end }}
 ------------------------------------
+{{- if .Values.keycloak.adminUser }}
 Login username: {{ .Values.keycloak.adminUser }}
+{{- end }}
 {{- if not .Values.keycloak.adminPasswordSecret.name }}
 The password has been auto generated, run the following to get the password:
   kubectl get secret {{ include "keycloak-chart.fullname" . }}-admin -o jsonpath='{.data.password}' | base64 -d

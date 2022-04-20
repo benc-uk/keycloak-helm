@@ -1,8 +1,8 @@
 # keycloak
 
-![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 17.0.0](https://img.shields.io/badge/AppVersion-17.0.0-informational?style=flat-square)
+![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 17.0.0](https://img.shields.io/badge/AppVersion-17.0.0-informational?style=flat-square)
 
-A Helm chart for deploying Quarkus based Keycloak (aka Keycloak.X or version 17+). Supports external database, ingress and clustering
+A Helm chart for deploying Keycloak.x (aka Keycloak Quarkus or version 17+). Supports external database, ingress and clustering
 
 ## Values
 
@@ -36,6 +36,7 @@ A Helm chart for deploying Quarkus based Keycloak (aka Keycloak.X or version 17+
 | keycloak.database.properties | string | `""` | External database: extra properties to add to the JDBC URL |
 | keycloak.database.username | string | `""` | External database: DB username |
 | keycloak.extraEnv | string | `nil` | Extra environment variables to set in the pod |
+| keycloak.extraEnvSecret | string | `nil` | Extra environment variables to set from secrets |
 | keycloak.healthCheckPath | string | `"/realms/master"` | The URL path used by readiness checks |
 | keycloak.hostnamePath | string | `""` | This should be set if proxy uses a different context path for Keycloak |
 | keycloak.hostnameStrict | bool | `false` | Enable or disable strict checking of the host |
