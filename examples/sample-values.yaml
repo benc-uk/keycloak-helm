@@ -1,3 +1,8 @@
+#
+# This is an example values file, it provided as a reference
+# It is not intended to be used as-is and there is no assurance the image ghcr.io/benc-uk/keycloak will remain available.
+#
+
 replicaCount: 2
 
 image:
@@ -29,7 +34,7 @@ ingress:
     enabled: true
     secretName: benco-io-cert
 
-# Everything below here is just to get the dbpassword secret from Key Vault
+# Everything below here is just to get the dbpassword secret from Key Vault using pod identity
 
 podLabels:
   aadpodidbinding: keycloak-identity-binding

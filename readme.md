@@ -1,13 +1,18 @@
-# Keycloak.X Quarkus - Helm Chart
+# Keycloak.X - Helm Chart
 
-A Helm chart for deploying the latest Quarkus based distrubtion of Keycloak (aka Keycloak.X or version 17+).  
-The chart support for external database, ingress, clustering and secret creation and exposes many of the Keycloak configuration variables in a more friendly and discoverable way
+A Helm chart for deploying the latest Quarkus based distribution of Keycloak (aka Keycloak.X or version 17+).  
+
+The chart supports using an external database, ingress, clustering and secret creation and exposes many of the Keycloak configuration variables in a more friendly and discoverable way.
+
+![](https://img.shields.io/github/license/benc-uk/keycloak-helm)
+![](https://img.shields.io/github/last-commit/benc-uk/keycloak-helm)
+![](https://img.shields.io/github/release/benc-uk/keycloak-helm)
 
 ## Quick Start
 
 Keycloak.X has been designed to be run from a customized image where `kc.sh build` has been run to tailor the configuration [see the docs](https://www.keycloak.org/server/containers)
 
-See the [build](./build/) folder for some example Dockerfiles.
+See the [build](./examples/build/) folder for some example Dockerfiles. These are provided purely as reference only.
 
 However it is possible to deploy the vanilla un-customized Keycloak image:
 
@@ -27,13 +32,28 @@ Using port-forward to connect to Keycloak and login with the admin account:
 kubectl port-forward kc-keycloak-0 8080:8080
 ```
 
+## Helm Repo
+
+This repo on GitHub is also usable directly as a Helm public remote repo, to add this repo to helm, run the following:
+
+```bash
+helm repo add keycloak https://benc-uk.github.io/keycloak-helm
+helm repo update keycloak
+```
+
+You can then use the chart by referencing it as `keycloak/keycloak`
+
+```bash
+helm install mykeycloak keycloak/keycloak ...
+```
+
 ## Chart Configuration Values
 
 [See the chart readme](./keycloak/README.md) for a full list of values that can be set. Many of these "wrap" Keycloak environmental variables
 
 ## Admin User
 
-The values `keycloak.adminUser` and `keycloak.adminPasswordSecret` control the creation of the admin user account. If `adminPasswordSecret` is not set, the a secret will be automatically created and a random password generated. Otherwise you can use `keycloak.adminPasswordSecret.name` and `.key` to reference an existing secret you want to use.
+The values `keycloak.adminUser` and `keycloak.adminPasswordSecret` control the creation of the admin user account. If `adminPasswordSecret` is NOT set, then a secret will be automatically created and a random password generated. Otherwise you can use `keycloak.adminPasswordSecret.name` and `.key` to reference an existing secret you want to use, in this case the creation of this secret is done outside of this Helm chart.
 
 ## Ingress
 
@@ -79,7 +99,7 @@ To enable clustering and multiple pods:
 - Set the `replicaCount` to a value greater than 1
 - Set `keycloak.clustered` to _true_
 
-When `keycloak.clustered` is set to _true_ twothings are done by the chart:
+When `keycloak.clustered` is set to _true_ two things are done by the chart:
 
 - A additional headless service is created in front of the pods, allowing for DNS discovery.
 - Extra parameter is passed to the Keycloak startup script, which is `-Djgroups.dns.query`. This is set to point at the name of the headless service.
@@ -87,6 +107,30 @@ When `keycloak.clustered` is set to _true_ twothings are done by the chart:
 **📃 NOTE 1** If clustering (i.e. a cache stack provider) has been enabled in the Keycloak image, then `keycloak.clustered` **must be set to true**, even if the replicaCount is 1. Keycloak will fall over if `dns.query` is not set
 
 **📃 NOTE 2** Only the Kubernetes cache stack provider has been tested, e.g. `KC_CACHE_STACK=kubernetes` when running `kc.sh build`
+
+## Extra environmental vars and secrets
+
+The chart is designed to pass most of the Keycloak environmental variables based on the chart values passed in, as such you don't need to set the `KC_` variables directly. However not every variable is catered for, and you may want some additional flexibility.
+
+For this `extraEnv` and `extraEnvSecret` can be used
+
+Example of using `extraEnv` would look like:
+
+```yaml
+keycloak:
+  extraEnv:
+    KC_SOME_SETTING: "Value here"
+```
+
+An example of `extraEnvSecret` might be as follows, say you have the database username stored as a secret, in which case you would not set `keycloak.database.username` and instead pass it in using `extraEnvSecret`, as follows:
+
+```yaml
+keycloak:
+  extraEnvSecret:
+    KC_DB_USERNAME:
+      secretName: sql-database-creds
+      secretKey: sql-username
+```
 
 ## URL Path
 

@@ -43,7 +43,12 @@ keycloak:
   # -- Extra environment variables to set in the pod
   extraEnv:
     # FOO: BAR
-
+  # -- Extra environment variables to set from secrets
+  extraEnvSecret:
+    # FOO:
+    #   secretName: foo-secret
+    #   secretKey: foo
+    
   database:
     # -- External database: reference to the secret containing the DB password
     passwordSecret:
